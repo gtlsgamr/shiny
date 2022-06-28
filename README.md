@@ -1,7 +1,13 @@
 # SHINY - An HTML to GemText converter 💎 
-------------------------------------
-NOTE: This is a work in progress.
-------------------------------------
+
+### NOTE: This is a work in progress.
+
+Compile using any C compiler. Then input html using stdin.
+```
+gcc shiny.c
+cat html_file.html | ./a.out > output.gmi
+```
+
 At this point, the program assumes a few things:
 * You will not nest tags on the same line.
 * You will start anchor tag attributes with the href attribute:
