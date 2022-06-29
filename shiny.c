@@ -43,6 +43,15 @@ void gettag(char *S){
 void tagparser(char *tag) {
 	in_tag=1;
 	int c=getchar();
+	
+	if(strcmp(tag,"title")==0){
+		printf("# ");
+		for(;c!='<';c=getchar()){
+			printf("%c",c);
+		}
+		for(;(c!='>');c=getchar());
+		printf("\n");
+	}
 
 	if(strcmp(tag,"a")==0){
 		printf("\n=> ");
@@ -59,8 +68,7 @@ void tagparser(char *tag) {
 		for(;(c!='>');c=getchar());
 		printf("\n");
 	}
-
-	if(strncmp(tag,"h",1)==0){
+	else if(strncmp(tag,"h",1)==0){
 		switch(tag[1]){
 			case '1': printf("# "); 
 					  break;
@@ -84,13 +92,44 @@ void tagparser(char *tag) {
 
 	}
 
-	if(strcmp(tag,"p")==0){
+
+	else if(strcmp(tag,"blockquote")==0){
+		printf("```");
 		printf("%c",c);
 		for(c=getchar();c!='<';c=getchar()){
 			printf("%c",c);
 		}
 		for(;(c!='>');c=getchar());
+		printf("```");
+	}
+
+	else if(strcmp(tag,"p")==0){
+		printf("%c",c);
+		for(c=getchar();c!='<';c=getchar()){
+			printf("%c",c);
+		}
+		for(;(c!='>');c=getchar());
+	}
+
+	else if(strcmp(tag,"li")==0){
+		printf("* ");
+		for(c=getchar();c!='<';c=getchar()){
+			printf("%c",c);
+		}
+		for(;(c!='>');c=getchar());
+	}
+
+	else if(strcmp(tag,"br")==0){
 		printf("\n");
+	}
+
+	else if(strcmp(tag,"hr")==0){
+		printf("-------------");
+	}
+
+	else {
+		for(;(c!='>');c=getchar());
+		for(;(c!='>');c=getchar());
 	}
 
 	in_tag=0;
@@ -99,7 +138,7 @@ void tagparser(char *tag) {
 void parser() {
 	int c,d;
 	char *curr_tag;
-	curr_tag = (char *)malloc(sizeof(char)*8);
+	curr_tag = (char *)malloc(50);
 	while ((c = getchar()) != EOF) {
 		if(c=='\n'){
 			printf("%c",c);
