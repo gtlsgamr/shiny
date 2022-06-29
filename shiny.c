@@ -93,14 +93,14 @@ void tagparser(char *tag) {
 	}
 
 
-	else if(strcmp(tag,"blockquote")==0){
-		printf("```");
+	else if(strcmp(tag,"blockquote")==0 || strcmp(tag,"pre")==0 || strcmp(tag,"code")==0 ){
+		printf("\n```\n");
 		printf("%c",c);
 		for(c=getchar();c!='<';c=getchar()){
 			printf("%c",c);
 		}
 		for(;(c!='>');c=getchar());
-		printf("```");
+		printf("\n```\n");
 	}
 
 	else if(strcmp(tag,"p")==0){
@@ -128,7 +128,6 @@ void tagparser(char *tag) {
 	}
 
 	else {
-		for(;(c!='>');c=getchar());
 		for(;(c!='>');c=getchar());
 	}
 

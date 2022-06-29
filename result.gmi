@@ -6,7 +6,7 @@ lang="en-us">
 
 
 
-# Mahabharat - Episode 29 - Lakshyagrah - ht's website.
+# Setting up znc with a subdomain using NGINX - ht's website.
 
 
 
@@ -30,67 +30,120 @@ ht.xyz
 &nbsp;
 => /posts/archive.html archives
 &nbsp;
-=> articletitle Mahabharat - Episode 29 - Lakshyagrah
+=> articletitle Setting up znc with a subdomain using NGINX
 
-2022-06-02
-
-
-Lakshyagrah
-```<p> Karna: Yudhh to tabhi hota hai, jab yodhhaon ki gadao se chingariyaan nikalti hai! Jab ek ka baan dusre ke baan se jaa takrata hai! Jab ek yodhha ke ghaav se nikalte rakt ki dhaara, dusre yodhha ke ghaav se nikalti rakt ki dhaara se jaa milti hai!```
-### Synopsis
-
-Gandhari  makes Yudhisthir promise to her that he will never have
-bad blood with Dhritrashtra. Shakuni and Duryodhan gang meet Pulochan, where
-they plan how to lure Pandavs to Lakshyagrah. Karna is against the cowardly
-plan to kill Pandavs, but nevertheless stays due to his bond with Duryodhan.
-Vidur is suspicious of Dhritrashtra and Kauravs eagerness to send Pandavs to
-Varnavat. He starts investigating on his own. Dhritrashtra tries to manipulate
-Bhishma into sending only Yudhisthir and not Duryodhan.
-### Discussion
-
-Shakuni has finally started hatching schemes. About half of the Mahabharat
-wouldn&rsquo;t have happened if it was not for Shakuni. He has built a Lakshyagrah
-(palace of wax) where he will invite the pandavs and burn them alive. Many
-circles in India always praise Karna due to his moral compass, but it falls
-short against his friendship with Duryodhan. Although he tries to turn
-Duryodhan away from the path of cowardice, he agrees to the plan eventually.
-Duryodhan himself seemed moved by Karna&rsquo;s words, and rightly so. But in the
-end, his lust for the throne wins and he starts on the path to self
-destruction.
-Dhritrashtra has turned full on manipulative murderer mode now, but of course,
-Vidur ji is smarter. He already smells something fishy and tries to get the
-Kauravs to join Yudhisthir in Varnavat, but fails in front of an already
-manipulated Bhishma. Throughout the story, there are many points when
-Dhritrashtra looks like a man guided by his surroundings, but today he shows
-his true form. He shows that nothing else matters to him other than his thirst
-for a throne that he does not deserve at all. The man who talked to Bhishma
-was not a man who was being manipulated by Shakuni but a man acting of his own
-accord.
-The cards are on the table. Kauravs have Bhishma, Drona, Kripacharya,
-Ashwathama, Jarasandh, Shishupal and Rukmi on their side. The scales seem a bit
-unbalanced, until we see that Shri Krishn is with Pandavs. The scales truly are
-unbalanced. ;)
+2022-06-10
 
 
+This post covers ubuntu/debian and systemd based operating systems. Although
+minor differences may exist, similar principle can be applied to other systems
+as well. Setting up znc on a linux machine is easy, and setting it up with a
+subdomain is easy as well! We will be using a standard znc installation and use
+certbot to generate SSL certificates.
+### Requirements
 
-### Notable dialogue
 
-```<p>Lokpriyata raja ka sabse shaktishaali shashtra hai.```
-<!------!>
-```<p>Baar baar mujhe ang raaj keh kar mera apmaan na kijiye! Duryodhan aur meri mitrata ka aadhar ye mukut nahi hai!```
-<!------!>
-```<p>Mai tumhari vo parchayi hoon, jo andhkaar me bhi tumhara sath nahi chhodegi. Mera bhagya tumhare bhagyase juda hua hai mitra.```
-<!------!>
-```<p>Antaraatma rann bhoomi nahi hai mitra, jisse koi bhaag sake.```
-<!------!>
-```<p>iss dasi putra ko bhai mat kahiye maharaj.```
-Ganga jal to ganga jal hi rehta hai Vidur, Gagar chahe sone ki ho ya mitti ki.
-Maa gagar nahi hoti Bhratashri. Beej apne aap me kuch bhi nahi hota jab tak use bhoomi ka sneh na mile. Beej Antriksh me nahi panap sakta.
-<!------!>
-```<p>Raja ka dharm logo se darna nahi hai Dhritrashtra, raja ka dharm logo se prem karna hai.
+=> https://wiki.znc.in/Installation znc
+
+
+=> https://nginx.org/en/ nginx
+
+
+=> https://certbot.eff.org/ certbot
+
+Install znc using any method explained on the main site.
+If you are on ubuntu, you can install znc and nginx using
+
 ```
-### To be continued
+sudo apt install znc nginx certbot
+```
 
+### Configuration
+
+Once that is done, we need to create config file for znc. That can be done by
+
+```
+znc --makeconf
+```
+
+It will ask you multiple questions, here is how I answered them:
+
+```
+<code>   Listen on port: 1025    
+   Listen using SSL: yes    
+   Listen using both IPv4 and IPv6: no    
+   Username: your_username    
+   Enter password: your_password     
+   Confirm password: your_password            
+   Nick: nick     
+   Alternate nick: nick_    
+   Real name: optional    
+   Bind host:    
+   Set up a network? no    
+   Launch ZNC now? no    
+
+```
+
+At this point znc has created your config file at
+
+```
+$HOME/.znc/configs/znc.conf
+```
+.
+Now we modify the config so that there are two listeners instead of one.  You will use the first one to modify znc settings and the second one
+to access znc network via IRC.
+
+```
+<code>&lt;Listener listener0&gt;
+    AllowIRC = false
+    AllowWeb = true
+    IPv4 = true
+    IPv6 = false
+    Port = 31337
+    SSL = true
+    URIPrefix = /
+&lt;/Listener&gt;
+
+&lt;Listener listener1&gt;
+    AllowIRC = true
+    AllowWeb = false
+    IPv4 = true
+    IPv6 = false
+    Port = 1337
+    SSL = true
+    URIPrefix = /
+&lt;/Listener&gt;
+
+```
+
+You can start znc by simply entering znc.
+### Setting up reverse proxy
+
+All that is left now is to configure nginx so that it will pass the
+subdomain requests to znc. Create the znc config file at
+/etc/nginx/sites-enabled/znc 
+
+```
+<code>server {
+    server_name znc.yourdomain.xyz;
+    access_log  /var/log/nginx/znc-access.log;
+    error_log   /var/log/nginx/znc-error.log;
+
+    location / {
+        proxy_pass https://127.0.0.1:31337/;
+    }
+}
+
+```
+
+After this check for errors in the configuration:
+sudo nginx -t
+Restart nginx service from systemd:
+sudo systemctl restart nginx
+One last thing left to do is generate ssl certificates for the znc subdomain.
+You can do that by using certbot command. Enter it and follow the
+instructions to proceed.
+Now your znc web interface should be accessible from znc.yourdomain.xyz
 
 Post Comment
 

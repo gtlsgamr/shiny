@@ -5,9 +5,9 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<title>Mahabharat - Episode 29 - Lakshyagrah - ht's website.</title>
+		<title>Setting up znc with a subdomain using NGINX - ht's website.</title>
 		<link rel="icon" type="image/x-icon" href="/static/images/favicon/favicon.ico">
-		<meta name="description" content="Duryodhan asks Dhritrashtra to send the Pandav brothers to Varnavat to attend a festival. He threatens to commit suicide if Pandav brothers are not sent to Varnavat.">
+		<meta name="description" content="Quick tutorial on setting up ZNC - IRC bouncer with an nginx reverse proxy">
 		<style>
 @import url('/static/fonts/inter.css');
 body{font-size:18px;font-family:'Inter', sans-serif;font-weight:500;color:#333;line-height:1.5;margin:0 auto;max-width:40em;padding:0 1em;background-color:#f7f7f7}input{filter: drop-shadow(0.30em 0.30em 0.0em rgb(0,0,0));margin:10px 0;width:95%;height:2em;font-family:monospace;font-weight:500}textarea{filter: drop-shadow(0.30em 0.30em 0.0em #000);margin:10px 0;width:95%;height:10em;font-weight:500}button{filter: drop-shadow(0.30em 0.30em 0.0em #000);margin:10px 0;background-color:white;height:3em;font-weight:500;font-family:monospace}main{word-wrap:break-word;word-break:normal;padding:10px;margin-bottom:5em}nav ul{word-wrap:break-word;word-break:normal;list-style-type:none;margin:0;padding:0}nav li{display:inline}header h1{color:black;text-decoration:none;padding:0 10px}footer{text-align:center}h1,h2,h3,h4,h5,h6{margin:1.25em 0 0.5em;line-height:1.2}nav a{font-weight:700;padding:0 4px;text-decoration:underline}a:link{color:#457ab7}a:visited{color:#7f79ce}a:focus,a:hover{color:#3c6593}a:active{text-decoration:underline}header a:link{color:black;text-decoration:none}header a:visited{color:black;text-decoration:none}header a:focus,header a:hover{color:black;text-decoration:none}header a:active{color:black;text-decoration:none}h1 a:empty:before,h2 a:empty:before,h3 a:empty:before,h4 a:empty:before,h5 a:empty:before,h6 a:empty:before{content:"#"}h1 a:empty,h2 a:empty,h3 a:empty,h4 a:empty,h5 a:empty,h6 a:empty{visibility:hidden;padding-left:0.25em}h1:hover a:empty,h2:hover a:empty,h3:hover a:empty,h4:hover a:empty,h5:hover a:empty,h6:hover a:empty{visibility:visible}img{max-width:100%}figure{margin:1em 0;text-align:center}figcaption{font-size:small}code,kbd,pre,samp{color:#ea4f41;font-family:monospace, monospace}pre kbd{color:#060}blockquote,pre{background:#eee;padding:0.5em}pre{overflow:auto}blockquote{font-style: italic; border-left:medium solid #ccc;margin:1em 0}blockquote:first-child{margin-top:0}blockquote:last-child{margin-bottom:0}table{border-collapse:collapse}td,th{border:thin solid #999;padding:0.3em 0.4em;text-align:left}@media (prefers-color-scheme: dark){body{font-size:18px;font-family:'Inter', sans-serif;font-weight:500;color:#eee;line-height:1.5;margin:0 auto;max-width:40em;padding:0 1em;background-color:#111e28}a:link{color:#91ccee}a:visited{color:#8daabb}a:focus,a:hover{color:#b0dffb}a:active{text-decoration:underline}code,kbd,pre,samp{color:#6cf}pre kbd{color:#9c6}blockquote,pre{background:#24323d}blockquote{border-color:#24323d}td,th{border-color:#666}button,input,textarea{filter: drop-shadow(0.30em 0.30em 0.0em #fff)}header a:active,header a:focus,header a:hover,header a:link,header a:visited{color:#eee;text-decoration:none}}#gallery{line-height:0;-webkit-column-count:3;-webkit-column-gap:5px;-moz-column-count:3;-moz-column-gap:5px;column-count:3;column-gap:5px}#gallery img{width:100% !important;height:auto !important;margin-bottom:5px}@media (max-width: 1200px){#gallery{-moz-column-count:3;-webkit-column-count:3;column-count:3}}@media (max-width: 1000px){#gallery{-moz-column-count:3;-webkit-column-count:3;column-count:3}}@media (max-width: 800px){#gallery{-moz-column-count:2;-webkit-column-count:2;column-count:2}}@media (max-width: 400px){#gallery{-moz-column-count:1;-webkit-column-count:1;column-count:1}}</style>
@@ -22,84 +22,108 @@ body{font-size:18px;font-family:'Inter', sans-serif;font-weight:500;color:#333;l
 				<ul><li><a href='/'>home</a>&nbsp;</li><li><a href='/posts/projects'>projects</a>&nbsp;</li><li><a href='/posts/blog'>blog</a>&nbsp;</li><li><a href='/posts/artwork'>artwork</a>&nbsp;</li><li><a href='/posts/poems'>poetry</a>&nbsp;</li><li><a href='/posts/archive.html'>archives</a>&nbsp;</li></ul>
 			</nav>
 			<hr>
-			<h3 id='articletitle'>Mahabharat - Episode 29 - Lakshyagrah</h3>
-			2022-06-02
+			<h3 id='articletitle'>Setting up znc with a subdomain using NGINX</h3>
+			2022-06-10
 			<hr>
-<h4>Lakshyagrah</h4>
+<p>This post covers ubuntu/debian and systemd based operating systems. Although
+minor differences may exist, similar principle can be applied to other systems
+as well. Setting up znc on a linux machine is easy, and setting it up with a
+subdomain is easy as well! We will be using a standard znc installation and use
+certbot to generate SSL certificates.</p>
 
-<blockquote><p> Karna: Yudhh to tabhi hota hai, jab yodhhaon ki gadao se chingariyaan nikalti hai! Jab ek ka baan dusre ke baan se jaa takrata hai! Jab ek yodhha ke ghaav se nikalte rakt ki dhaara, dusre yodhha ke ghaav se nikalti rakt ki dhaara se jaa milti hai!</p></blockquote>
+<h3>Requirements</h3>
 
-<h4>Synopsis</h4>
+<a href="https://wiki.znc.in/Installation">znc</a>
+<a href="https://nginx.org/en/">nginx</a>
+<a href="https://certbot.eff.org/">certbot</a>
 
-<p>Gandhari  makes Yudhisthir promise to her that he will never have
-bad blood with Dhritrashtra. Shakuni and Duryodhan gang meet Pulochan, where
-they plan how to lure Pandavs to Lakshyagrah. Karna is against the cowardly
-plan to kill Pandavs, but nevertheless stays due to his bond with Duryodhan.
-Vidur is suspicious of Dhritrashtra and Kauravs eagerness to send Pandavs to
-Varnavat. He starts investigating on his own. Dhritrashtra tries to manipulate
-Bhishma into sending only Yudhisthir and not Duryodhan.</p>
+<p>Install znc using any method explained on the <a href="https://wiki.znc.in/Installation">main site</a>.</p>
 
-<h4>Discussion</h4>
+<p>If you are on ubuntu, you can install znc and nginx using</p>
 
-<p>Shakuni has finally started hatching schemes. About half of the Mahabharat
-wouldn&rsquo;t have happened if it was not for Shakuni. He has built a Lakshyagrah
-(<em>palace of wax</em>) where he will invite the pandavs and burn them alive. Many
-circles in India always praise Karna due to his moral compass, but it falls
-short against his friendship with Duryodhan. Although he tries to turn
-Duryodhan away from the path of cowardice, he agrees to the plan eventually.
-Duryodhan himself seemed moved by Karna&rsquo;s words, and rightly so. But in the
-end, his lust for the throne wins and he starts on the path to self
-destruction.</p>
+<code>sudo apt install znc nginx certbot</code></p>
 
-<p>Dhritrashtra has turned full on manipulative murderer mode now, but of course,
-Vidur ji is smarter. He already smells something fishy and tries to get the
-Kauravs to join Yudhisthir in Varnavat, but fails in front of an already
-manipulated Bhishma. Throughout the story, there are many points when
-Dhritrashtra looks like a man guided by his surroundings, but today he shows
-his true form. He shows that nothing else matters to him other than his thirst
-for a throne that he does not deserve at all. The man who talked to Bhishma
-was not a man who was being manipulated by Shakuni but a man acting of his own
-accord.</p>
+<h3>Configuration</h3>
 
-<p>The cards are on the table. Kauravs have Bhishma, Drona, Kripacharya,
-Ashwathama, Jarasandh, Shishupal and Rukmi on their side. The scales seem a bit
-unbalanced, until we see that Shri Krishn is with Pandavs. The scales truly are
-unbalanced. ;)</p>
+<p>Once that is done, we need to create config file for znc. That can be done by</p>
 
-<figure><img src="/static/images/mahabharat/ep_29_1.webp" alt="Duryodhan gang meets Pulochan"/><figcaption>Duryodhan gang meets Pulochan</figcaption></figure>
-<figure><img src="/static/images/mahabharat/ep_29_3.webp" alt="Karna tries to turn Duryodhan"/><figcaption>Karna tries to turn Duryodhan</figcaption></figure>
-<figure><img src="/static/images/mahabharat/ep_29_4.webp" alt="Dhritrashtra gets Bhishma to send Pandavs"/><figcaption>Dhritrashtra gets Bhishma to send Pandavs</figcaption></figure>
+<code>znc --makeconf</code></p>
 
-<h4>Notable dialogue</h4>
+<p>It will ask you multiple questions, here is how I answered them:</p>
 
-<blockquote><p>Lokpriyata raja ka sabse shaktishaali shashtra hai.</p></blockquote>
+<pre><code>   Listen on port: 1025    
+   Listen using SSL: yes    
+   Listen using both IPv4 and IPv6: no    
+   Username: your_username    
+   Enter password: your_password     
+   Confirm password: your_password            
+   Nick: nick     
+   Alternate nick: nick_    
+   Real name: optional    
+   Bind host:    
+   Set up a network? no    
+   Launch ZNC now? no    
+</code></pre>
 
-<p><!------!></p>
+<p>At this point znc has created your config file at</p>
 
-<blockquote><p>Baar baar mujhe ang raaj keh kar mera apmaan na kijiye! Duryodhan aur meri mitrata ka aadhar ye mukut nahi hai!</p></blockquote>
+<code>$HOME/.znc/configs/znc.conf</code>.
+Now we modify the config so that there are two listeners instead of one. <strong>(Note how
+one allows web interface while the other is for IRC, both on different
+ports.)</strong> You will use the first one to modify znc settings and the second one
+to access znc network via IRC.</p>
 
-<p><!------!></p>
+<pre><code>&lt;Listener listener0&gt;
+    AllowIRC = false
+    AllowWeb = true
+    IPv4 = true
+    IPv6 = false
+    Port = 31337
+    SSL = true
+    URIPrefix = /
+&lt;/Listener&gt;
 
-<blockquote><p>Mai tumhari vo parchayi hoon, jo andhkaar me bhi tumhara sath nahi chhodegi. Mera bhagya tumhare bhagyase juda hua hai mitra.</p></blockquote>
+&lt;Listener listener1&gt;
+    AllowIRC = true
+    AllowWeb = false
+    IPv4 = true
+    IPv6 = false
+    Port = 1337
+    SSL = true
+    URIPrefix = /
+&lt;/Listener&gt;
+</code></pre>
 
-<p><!------!></p>
+<p>You can start znc by simply entering <code>znc</code>.</p>
 
-<blockquote><p>Antaraatma rann bhoomi nahi hai mitra, jisse koi bhaag sake.</p></blockquote>
+<h3>Setting up reverse proxy</h3>
 
-<p><!------!></p>
+<p>All that is left now is to configure nginx so that it will pass the
+subdomain requests to znc. Create the znc config file at
+<code>/etc/nginx/sites-enabled/znc</code> <strong>Make sure your DNS record for selected subdomain point to the IP of your host.</strong></p>
 
-<blockquote><p>iss dasi putra ko bhai mat kahiye maharaj.</p>
+<pre><code>server {
+    server_name znc.yourdomain.xyz;
+    access_log  /var/log/nginx/znc-access.log;
+    error_log   /var/log/nginx/znc-error.log;
 
-<p>Ganga jal to ganga jal hi rehta hai Vidur, Gagar chahe sone ki ho ya mitti ki.</p>
+    location / {
+        proxy_pass https://127.0.0.1:31337/;
+    }
+}
+</code></pre>
 
-<p>Maa gagar nahi hoti Bhratashri. Beej apne aap me kuch bhi nahi hota jab tak use bhoomi ka sneh na mile. Beej Antriksh me nahi panap sakta.</p></blockquote>
+<p>After this check for errors in the configuration:
+<code>sudo nginx -t</code></p>
 
-<p><!------!></p>
+<p>Restart nginx service from systemd:
+<code>sudo systemctl restart nginx</code></p>
 
-<blockquote><p>Raja ka dharm logo se darna nahi hai Dhritrashtra, raja ka dharm logo se prem karna hai.
-<!------!></p></blockquote>
+<p>One last thing left to do is generate ssl certificates for the znc subdomain.
+You can do that by using <code>certbot</code> command. Enter it and follow the
+instructions to proceed.</p>
 
-<h4>To be continued</h4>
+<p>Now your znc web interface should be accessible from <code>znc.yourdomain.xyz</code></p>
 <form name="comments" id='formcomments' method='POST' action='/cgi-bin/addcomment.cgi'>
 	<div><h3>Post Comment</h3></div>
 	<div>
