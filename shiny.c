@@ -1,17 +1,17 @@
 /*	
 	SHINY - An HTML to GemText converter
 	====================================
-	WIP: Please provide suggestions to:
-	gtlsgamr<gtlsgamr@tilde.team> or 
-	gtlsgamr<gtlsgamr@ctrl-c.club>  
-	====================================
-	At this point, the program assumes a few things:
-		 * You will not nest tags on the same line.
-		 * You will start anchor tag attributes with the href attribute:
-		 <a href=""..... > </a>   <---- Correct
-		 <a class="" href=""..... > </a>   <---- Correct
-		 * One type of tag on one line, if possible.
-		 * You will enter html without meta data. It might work with it, but try to input only the stuff that you want to convert and nothing else.
+WIP: Please provide suggestions to:
+gtlsgamr<gtlsgamr@tilde.team> or 
+gtlsgamr<gtlsgamr@ctrl-c.club>  
+====================================
+At this point, the program assumes a few things:
+ * You will not nest tags on the same line.
+ * You will start anchor tag attributes with the href attribute:
+ <a href=""..... > </a>   <---- Correct
+ <a class="" href=""..... > </a>   <---- Correct
+ * One type of tag on one line, if possible.
+ * You will enter html without meta data. It might work with it, but try to input only the stuff that you want to convert and nothing else.
  */
 
 #include <stdio.h>
@@ -43,7 +43,7 @@ void gettag(char *S){
 void tagparser(char *tag) {
 	in_tag=1;
 	int c=getchar();
-	
+
 	if(strcmp(tag,"title")==0){
 		printf("# ");
 		for(;c!='<';c=getchar()){
@@ -93,7 +93,7 @@ void tagparser(char *tag) {
 	}
 
 
-	else if(strcmp(tag,"blockquote")==0 || strcmp(tag,"pre")==0 || strcmp(tag,"code")==0 ){
+	else if(strcmp(tag,"pre")==0 || strcmp(tag,"code")==0 ){
 		printf("\n```\n");
 		printf("%c",c);
 		for(c=getchar();c!='<';c=getchar()){
@@ -101,6 +101,16 @@ void tagparser(char *tag) {
 		}
 		for(;(c!='>');c=getchar());
 		printf("\n```\n");
+	}
+
+	else if(strcmp(tag,"blockquote")==0){
+		printf("%c",c);
+		printf("> ");
+		for(c=getchar();c!='<';c=getchar()){
+				printf("%c",c);
+			}
+		for(;(c!='>');c=getchar());
+
 	}
 
 	else if(strcmp(tag,"p")==0){
